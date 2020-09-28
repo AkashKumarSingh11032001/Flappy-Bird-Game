@@ -177,7 +177,23 @@ def isCollide(playerx, playery, upperPipes, lowerPipes):
     return False
 
 
+# Generate positions of two pipes(one bottom straight and one top rotated ) for blitting on the screen
 
+
+def getRandomPipe():
+    pipeHeight = Game_Sprites['pipe'][0].get_height()
+    offset = ScreanHeight / 3
+    y2 = offset + random.randrange(0, int(ScreanHeight - Game_Sprites['base'].get_height() - 1.2 * offset))
+    pipeX = ScreanWidth + 10
+    y1 = pipeHeight - y2 + offset
+    pipe = [
+        {'x': pipeX, 'y': -y1},  # upper Pipe
+        {'x': pipeX, 'y': y2}  # lower Pipe
+    ]
+    return pipe
+
+ 
+# main sequencial function 
 
 if __name__ == "__main__":
     # This will be the main point from where our game will start
