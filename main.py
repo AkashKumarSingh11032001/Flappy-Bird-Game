@@ -155,10 +155,30 @@ def mainGame():
         FPSCLOCK.tick(FPS)
 
 
+# setting Collider, that means that we basically setting the limit that how bird will die after touching pipe
+
+def isCollide(playerx, playery, upperPipes, lowerPipes):
+    if playery > Ground_Y - 25 or playery < 0:
+        Game_Sound['hit'].play()
+        return True
+
+    for pipe in upperPipes:
+        pipeHeight = Game_Sprites['pipe'][0].get_height()
+        if (playery < pipeHeight + pipe['y'] and abs(playerx - pipe['x']) < Game_Sprites['pipe'][0].get_width()):
+            Game_Sound['hit'].play()
+            return True
+
+    for pipe in lowerPipes:
+        if (playery + Game_Sprites['player'].get_height() > pipe['y']) and abs(playerx - pipe['x']) < \
+                Game_Sprites['pipe'][0].get_width():
+            Game_Sound['hit'].play()
+            return True
+
+    return False
 
 
 
-        
+
 if __name__ == "__main__":
     # This will be the main point from where our game will start
     pygame.init()  # Initialize all pygame's modules
