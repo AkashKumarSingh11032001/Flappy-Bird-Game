@@ -23,6 +23,35 @@ Background = 'gallery/sprites/background.png'
 Pipe = 'gallery/sprites/pipe.png'
 
 
+# this function help to show welcome screan !!!
+
+def welcomeScreen():
+
+
+    playerx = int(ScreanWidth / 5)
+    playery = int((ScreanHeight - Game_Sprites['player'].get_height()) / 2)
+    messagex = int((ScreanWidth - Game_Sprites['message'].get_width()) / 2)
+    messagey = int(ScreanHeight * 0.13)
+    basex = 0
+    while True:
+        for event in pygame.event.get():
+            # if user clicks on cross button, close the game
+            if event.type == QUIT or (event.type == KEYDOWN and event.key == K_ESCAPE):
+                pygame.quit()
+                sys.exit()
+
+            # If the user presses space or up key, start the game for them
+            elif event.type == KEYDOWN and (event.key == K_SPACE or event.key == K_UP):
+                return
+            else:
+                Screan.blit(Game_Sprites['background'], (0, 0))
+                Screan.blit(Game_Sprites['player'], (playerx, playery))
+                Screan.blit(Game_Sprites['message'], (messagex, messagey))
+                Screan.blit(Game_Sprites['base'], (basex, Ground_Y))
+                pygame.display.update()
+                FPSCLOCK.tick(FPS)
+
+
 
 if __name__ == "__main__":
     # This will be the main point from where our game will start
