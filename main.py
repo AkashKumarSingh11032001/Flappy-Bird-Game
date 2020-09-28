@@ -52,7 +52,113 @@ def welcomeScreen():
                 FPSCLOCK.tick(FPS)
 
 
+# main function (major part of game ~ analytical calculation)
 
+def mainGame():
+    score = 0 # score to 0
+    playerx = int(ScreanWidth / 5) # setting player(bird) at center
+    playery = int(ScreanWidth / 2) # setting player(bird) at center
+    basex = 0
+
+    # Create 2 pipes for blitting on the screen
+    newPipe1 = getRandomPipe()
+    newPipe2 = getRandomPipe()
+
+    # my List of upper pipes
+    upperPipes = [
+        {'x': ScreanWidth + 200, 'y': newPipe1[0]['y']},
+        {'x': ScreanWidth + 200 + (ScreanWidth / 2), 'y': newPipe2[0]['y']},
+    ]
+    # my List of lower pipes
+    lowerPipes = [
+        {'x': ScreanWidth + 200, 'y': newPipe1[1]['y']},
+        {'x': ScreanWidth + 200 + (ScreanWidth / 2), 'y': newPipe2[1]['y']},
+    ]
+
+    pipeVelX = -4
+
+    playerVelY = -9
+    playerMaxVelY = 10
+    playerMinVelY = -8
+    playerAccY = 1
+
+    playerFlapAccv = -8  # velocity while flapping
+    playerFlapped = False  # It is true only when the bird is flapping
+    # internship2020 #lpu
+    while True:
+        for event in pygame.event.get():
+            if event.type == QUIT or (event.type == KEYDOWN and event.key == K_ESCAPE):
+                pygame.quit()
+                sys.exit()
+            if event.type == KEYDOWN and (event.key == K_SPACE or event.key == K_UP):
+                if playery > 0:
+                    playerVelY = playerFlapAccv
+                    playerFlapped = True
+                    Game_Sound['wing'].play()
+
+        crashTest = isCollide(playerx, playery, upperPipes,
+                              lowerPipes)  # This function will return true if the player is crashed
+        if crashTest:
+            return
+
+            # check for score
+        playerMidPos = playerx + Game_Sprites['player'].get_width() / 2
+        for pipe in upperPipes:
+            pipeMidPos = pipe['x'] + Game_Sprites['pipe'][0].get_width() / 2
+            if pipeMidPos <= playerMidPos < pipeMidPos + 4:
+                score += 1
+                print(f"Your score is {score}")
+                Game_Sound['point'].play()
+
+        if playerVelY < playerMaxVelY and not playerFlapped:
+            playerVelY += playerAccY
+
+        if playerFlapped:
+            playerFlapped = False
+        playerHeight = Game_Sprites['player'].get_height()
+        playery = playery + min(playerVelY, Ground_Y - playery - playerHeight)
+
+        # move pipes to the left
+        for upperPipe, lowerPipe in zip(upperPipes, lowerPipes):
+            upperPipe['x'] += pipeVelX
+            lowerPipe['x'] += pipeVelX
+
+        # Add a new pipe when the first is about to cross the leftmost part of the screen
+        if 0 < upperPipes[0]['x'] < 5:
+            newpipe = getRandomPipe()
+            upperPipes.append(newpipe[0])
+            lowerPipes.append(newpipe[1])
+
+        # if the pipe is out of the screen, remove it
+        if upperPipes[0]['x'] < -Game_Sprites['pipe'][0].get_width():
+            upperPipes.pop(0)
+            lowerPipes.pop(0)
+
+        # Lets blit our sprites now
+        Screan.blit(Game_Sprites['background'], (0, 0))
+        for upperPipe, lowerPipe in zip(upperPipes, lowerPipes):
+            Screan.blit(Game_Sprites['pipe'][0], (upperPipe['x'], upperPipe['y']))
+            Screan.blit(Game_Sprites['pipe'][1], (lowerPipe['x'], lowerPipe['y']))
+
+        Screan.blit(Game_Sprites['base'], (basex, Ground_Y))
+        Screan.blit(Game_Sprites['player'], (playerx, playery))
+        myDigits = [int(x) for x in list(str(score))]
+        width = 0
+        for digit in myDigits:
+            width += Game_Sprites['numbers'][digit].get_width()
+        Xoffset = (ScreanWidth - width) / 2
+
+        for digit in myDigits:
+            Screan.blit(Game_Sprites['numbers'][digit], (Xoffset, ScreanHeight * 0.12))
+            Xoffset += Game_Sprites['numbers'][digit].get_width()
+        pygame.display.update()
+        FPSCLOCK.tick(FPS)
+
+
+
+
+
+        
 if __name__ == "__main__":
     # This will be the main point from where our game will start
     pygame.init()  # Initialize all pygame's modules
